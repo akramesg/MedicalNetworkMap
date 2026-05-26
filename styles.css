@@ -475,6 +475,15 @@ body {
     border-radius: var(--radius-md);
     margin: 0 24px 16px;
     overflow: hidden;
+    transition: all var(--transition-normal);
+}
+
+.filter-controls-card.collapsed .filters-body {
+    display: none !important;
+}
+
+.filter-controls-card.collapsed {
+    border-bottom-width: 1px;
 }
 
 .filters-header {
@@ -484,6 +493,42 @@ body {
     align-items: center;
     border-bottom: 1px solid var(--border-color);
     background: rgba(255, 255, 255, 0.02);
+    user-select: none;
+    transition: background-color var(--transition-fast);
+}
+
+.filters-header:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+/* Mobile specific close button inside header */
+.mobile-close-sidebar-btn {
+    position: absolute;
+    top: 24px;
+    left: 24px; /* Float top-left in RTL */
+    background: var(--bg-input);
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    width: 34px;
+    height: 34px;
+    border-radius: var(--radius-circle);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition-fast);
+    z-index: 1002;
+}
+
+.mobile-close-sidebar-btn:hover {
+    background: var(--col-hospital);
+    color: var(--text-on-accent);
+    border-color: var(--col-hospital);
+    transform: scale(1.05);
+}
+
+.mobile-close-sidebar-btn:active {
+    transform: scale(0.95);
 }
 
 .filter-title {

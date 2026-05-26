@@ -542,6 +542,24 @@ function setupEventListeners() {
         });
     }
 
+    // Mobile top-left close button trigger
+    const mobileCloseBtn = document.getElementById("mobile-close-sidebar-btn-id");
+    if (mobileCloseBtn) {
+        mobileCloseBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            sidebarPanel.classList.remove("expanded");
+        });
+    }
+
+    // Advanced filters header collapsible click trigger
+    const filterHeader = document.getElementById("filters-header-id");
+    const filterCard = document.getElementById("filter-card-id");
+    if (filterHeader && filterCard) {
+        filterHeader.addEventListener("click", () => {
+            filterCard.classList.toggle("collapsed");
+        });
+    }
+
     // Input click/focus expands mobile drawer
     if (searchInput) {
         searchInput.addEventListener("click", (e) => {

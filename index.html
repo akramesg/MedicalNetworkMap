@@ -97,7 +97,18 @@
                     <i class="fa-solid fa-heart-pulse logo-icon"></i>
                     <div class="brand-text">
                         <h1>MedSure Network</h1>
-               <!-- Real-Time Metrics Row -->
+                        <span class="badge">A++ Class</span>
+                    </div>
+                </div>
+                <p class="brand-subtitle">البحث الذكي وتصفية شبكة الرعاية الطبية المعتمدة</p>
+            </header>
+            
+            <!-- Mobile Close Button -->
+            <button class="mobile-close-sidebar-btn mobile-only" id="mobile-close-sidebar-btn-id" title="إغلاق القائمة" aria-label="Close Sidebar">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            
+            <!-- Real-Time Metrics Row -->
             <div class="stats-ticker">
                 <div class="ticker-item">
                     <span class="ticker-num" id="ticker-total">0</span>
@@ -119,10 +130,13 @@
             </div>
             
             <!-- Dynamic Filters Panel -->
-            <div class="filter-controls-card">
-                <div class="filters-header" id="filters-header-id">
-                    <span class="filter-title"><i class="fa-solid fa-sliders"></i> فلاتر متقدمة</span>
-                    <button class="reset-filters-link" id="reset-filters-btn">إعادة تعيين</button>
+            <div class="filter-controls-card collapsed" id="filter-card-id">
+                <div class="filters-header" id="filters-header-id" style="cursor: pointer;">
+                    <span class="filter-title">
+                        <i class="fa-solid fa-sliders"></i> فلاتر متقدمة
+                        <i class="fa-solid fa-chevron-down toggle-icon" style="margin-right: 6px; font-size: 0.8rem; transition: transform 0.3s; display: inline-block;"></i>
+                    </span>
+                    <button class="reset-filters-link" id="reset-filters-btn" onclick="event.stopPropagation()">إعادة تعيين</button>
                 </div>
                 
                 <div class="filters-body">
