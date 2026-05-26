@@ -1110,36 +1110,124 @@ select:disabled {
     }
     
     .sidebar-panel {
-        right: 10px;
-        left: 10px;
-        top: 10px;
-        bottom: 10px;
-        width: calc(100% - 20px);
-        transform: translateY(120%);
-        transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        right: 12px;
+        left: 12px;
+        bottom: 12px;
+        top: auto !important; /* override top */
+        width: calc(100% - 24px) !important;
+        height: 72px; /* collapsed height: shows brand/search only */
+        transform: none !important; /* remove translates */
+        transition: height 0.4s var(--timing-smooth), background-color var(--transition-normal);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-premium);
+        display: flex;
+        flex-direction: column;
     }
     
-    .sidebar-panel.active {
-        transform: translateY(0);
+    /* When minimized, hide everything else */
+    .sidebar-panel:not(.expanded) .sidebar-header,
+    .sidebar-panel:not(.expanded) .stats-ticker,
+    .sidebar-panel:not(.expanded) .filter-controls-card,
+    .sidebar-panel:not(.expanded) .results-meta,
+    .sidebar-panel:not(.expanded) .results-list-container {
+        display: none !important;
+    }
+    
+    .sidebar-panel:not(.expanded) .search-box {
+        padding: 12px 16px 16px !important;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        margin: 0 !important;
+    }
+    
+    .sidebar-panel:not(.expanded) .search-input-wrapper {
+        width: 100%;
+    }
+    
+    /* When expanded on mobile */
+    .sidebar-panel.expanded {
+        height: 82% !important; /* Occupies 82% of height */
+    }
+    
+    .sidebar-panel.expanded .sidebar-header {
+        padding: 8px 20px 8px !important;
+    }
+    
+    .sidebar-panel.expanded .search-box {
+        padding: 0 20px 10px !important;
+    }
+    
+    .sidebar-panel.expanded .stats-ticker {
+        margin: 4px 20px !important;
+        padding: 8px !important;
+    }
+    
+    .sidebar-panel.expanded .filter-controls-card {
+        margin: 0 20px 10px !important;
+    }
+    
+    .sidebar-panel.expanded .results-list-container {
+        padding: 10px 20px !important;
+        flex: 1 !important;
+        overflow-y: auto !important;
+        display: block !important;
+    }
+    
+    /* Legend overlay on top of screen, styled neat on mobile */
+    .category-legend-overlay {
+        right: 12px !important;
+        left: 12px !important;
+        top: 12px !important; /* at the top */
+        z-index: 999;
+    }
+    
+    .legend-scroll-container {
+        border-radius: var(--radius-md) !important;
+        padding: 4px !important;
     }
 
-    .category-legend-overlay {
-        right: 10px;
-        left: 10px;
-        top: 70px;
-        z-index: 10;
+    .legend-pill {
+        padding: 5px 10px !important;
+        font-size: 0.78rem !important;
+        gap: 6px !important;
     }
     
+    /* Detail sheet adjusts for mobile */
     .detail-sheet {
-        right: 10px;
-        left: 10px;
-        bottom: 10px;
-        width: calc(100% - 20px);
-        z-index: 1001; /* Above sidebar in mobile */
+        right: 12px !important;
+        left: 12px !important;
+        bottom: 12px !important;
+        width: calc(100% - 24px) !important;
+        z-index: 1001; /* above sidebar */
+        padding: 16px !important;
+        max-height: 50% !important;
+    }
+    
+    .detail-head {
+        flex-direction: column !important;
+        gap: 12px !important;
+        align-items: stretch !important;
+        padding-bottom: 12px !important;
+    }
+    
+    .detail-directions-btn {
+        width: 100% !important;
+        justify-content: center !important;
+        padding: 10px !important;
+    }
+    
+    .detail-info-grid {
+        grid-template-columns: 1fr !important;
+        gap: 10px !important;
+    }
+    
+    .detail-info-card {
+        padding: 12px !important;
     }
     
     .map-actions-dock {
-        top: 10px;
-        left: 10px;
+        top: 70px !important; /* Move dock below top legend on mobile */
+        left: 12px !important;
     }
 }

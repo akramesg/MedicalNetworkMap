@@ -524,15 +524,42 @@ function setupEventListeners() {
         });
     }
 
-    // Mobile sidebar toggle trigger
+    // Map click collapses mobile sidebar
+    if (mapObj) {
+        mapObj.on("click", () => {
+            if (window.innerWidth <= 900) {
+                sidebarPanel.classList.remove("expanded");
+            }
+        });
+    }
+
+    // Mobile drag handle trigger
+    const mobileHandle = document.getElementById("mobile-handle-id");
+    if (mobileHandle) {
+        mobileHandle.addEventListener("click", (e) => {
+            e.stopPropagation();
+            sidebarPanel.classList.toggle("expanded");
+        });
+    }
+
+    // Input click/focus expands mobile drawer
+    if (searchInput) {
+        searchInput.addEventListener("click", (e) => {
+            if (window.innerWidth <= 900) {
+                sidebarPanel.classList.add("expanded");
+            }
+        });
+        searchInput.addEventListener("focus", (e) => {
+            if (window.innerWidth <= 900) {
+                sidebarPanel.classList.add("expanded");
+            }
+        });
+    }
+
+    // Mobile floating list button trigger
     if (toggleSidebarBtn) {
         toggleSidebarBtn.addEventListener("click", () => {
-            sidebarPanel.classList.toggle("active");
-            if (sidebarPanel.classList.contains("active")) {
-                toggleSidebarBtn.innerHTML = '<i class="fa-solid fa-xmark"></i>';
-            } else {
-                toggleSidebarBtn.innerHTML = '<i class="fa-solid fa-bars"></i>';
-            }
+            sidebarPanel.classList.toggle("expanded");
         });
     }
 
