@@ -1,0 +1,6 @@
+# Ignore heavy Excel source data
+*.xlsx
+
+# Ignore local system files
+.DS_Store
+Thumbs.db

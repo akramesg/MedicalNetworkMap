@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="البحث عن مقدمي الخدمة الطبية في شبكة MedSure Network A++ - خريطة تفاعلية للبحث السريع وتصفية المستشفيات والعيادات والصيدليات ومعامل التحاليل">
+    <title>MedSure Network A++ | شبكة الرعاية الطبية</title>
+    
+    <!-- Google Fonts: Outfit (English) & Cairo/Inter (Arabic/Clean typography) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome for Premium Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Leaflet.js Map Styles and Scripts -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    
+    <!-- Leaflet Marker Cluster Plugin for 60fps rendering of 5,000+ points -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" />
+    <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
+    
+    <!-- Custom Theme Styles -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="dark-theme">
+
+    <!-- App Container -->
+    <div class="app-layout">
+        
+        <!-- Main Map Viewport -->
+        <main class="map-container" id="map-container-id">
+            <div id="map"></div>
+            
+            <!-- Floating Quick-Action Buttons (Top-Left on RTL) -->
+            <div class="map-actions-dock">
+                <button id="theme-toggle-btn" class="dock-btn" title="تغيير المظهر (داكن/مضيء)" aria-label="Theme Toggle">
+                    <i class="fa-solid fa-moon"></i>
+                </button>
+                <button id="reset-view-btn" class="dock-btn" title="إعادة ضبط الخريطة" aria-label="Reset View">
+                    <i class="fa-solid fa-crosshairs"></i>
+                </button>
+                <button id="toggle-sidebar-btn" class="dock-btn mobile-only" title="عرض القائمة" aria-label="Toggle Sidebar">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+            </div>
+            
+            <!-- Category Legend Overlay on Map (Top Center) -->
+            <div class="category-legend-overlay">
+                <div class="legend-scroll-container">
+                    <button class="legend-pill active" data-type="all" id="btn-legend-all">
+                        <span class="pill-dot all"></span>
+                        <span class="pill-text">الكل</span>
+                        <span class="pill-count" id="count-all">0</span>
+                    </button>
+                    <button class="legend-pill active" data-type="مستشفى" id="btn-legend-hospitals">
+                        <span class="pill-dot hospital"></span>
+                        <span class="pill-text"><i class="fa-solid fa-hospital"></i> مستشفيات</span>
+                        <span class="pill-count" id="count-hospitals">0</span>
+                    </button>
+                    <button class="legend-pill active" data-type="معمل تحاليل" id="btn-legend-labs">
+                        <span class="pill-dot lab"></span>
+                        <span class="pill-text"><i class="fa-solid fa-microscope"></i> معامل</span>
+                        <span class="pill-count" id="count-labs">0</span>
+                    </button>
+                    <button class="legend-pill active" data-type="صيدلية" id="btn-legend-pharmacies">
+                        <span class="pill-dot pharmacy"></span>
+                        <span class="pill-text"><i class="fa-solid fa-prescription-bottle-medical"></i> صيدليات</span>
+                        <span class="pill-count" id="count-pharmacies">0</span>
+                    </button>
+                    <button class="legend-pill active" data-type="عيادة" id="btn-legend-clinics">
+                        <span class="pill-dot clinic"></span>
+                        <span class="pill-text"><i class="fa-solid fa-user-doctor"></i> عيادات</span>
+                        <span class="pill-count" id="count-clinics">0</span>
+                    </button>
+                    <button class="legend-pill active" data-type="مركز أشعة" id="btn-legend-radiology">
+                        <span class="pill-dot radiology"></span>
+                        <span class="pill-text"><i class="fa-solid fa-x-ray"></i> مراكز أشعة</span>
+                        <span class="pill-count" id="count-radiology">0</span>
+                    </button>
+                </div>
+            </div>
+        </main>
+        
+        <!-- Sidebar Panel (Search, Filters, results) -->
+        <aside class="sidebar-panel active" id="sidebar-id">
+            <!-- Sidebar Header -->
+            <header class="sidebar-header">
+                <div class="brand">
+                    <div class="logo-glow"></div>
+                    <i class="fa-solid fa-heart-pulse logo-icon"></i>
+                    <div class="brand-text">
+                        <h1>MedSure Network</h1>
+               <!-- Real-Time Metrics Row -->
+            <div class="stats-ticker">
+                <div class="ticker-item">
+                    <span class="ticker-num" id="ticker-total">0</span>
+                    <span class="ticker-lbl">مقدم خدمة</span>
+                </div>
+                <div class="ticker-item">
+                    <span class="ticker-num" id="ticker-govs">0</span>
+                    <span class="ticker-lbl">محافظة</span>
+                </div>
+            </div>
+            
+            <!-- Search Control -->
+            <div class="search-box">
+                <div class="search-input-wrapper">
+                    <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                    <input type="text" id="provider-search-input" placeholder="ابحث باسم المستشفى، التخصص، أو الخدمة..." aria-label="Search Providers">
+                    <button id="clear-search-btn" class="clear-btn" title="مسح البحث" aria-label="Clear Search"><i class="fa-solid fa-circle-xmark"></i></button>
+                </div>
+            </div>
+            
+            <!-- Dynamic Filters Panel -->
+            <div class="filter-controls-card">
+                <div class="filters-header" id="filters-header-id">
+                    <span class="filter-title"><i class="fa-solid fa-sliders"></i> فلاتر متقدمة</span>
+                    <button class="reset-filters-link" id="reset-filters-btn">إعادة تعيين</button>
+                </div>
+                
+                <div class="filters-body">
+                    <!-- Governorate Select -->
+                    <div class="filter-group">
+                        <label for="gov-select"><i class="fa-solid fa-map-location-dot"></i> المحافظة</label>
+                        <div class="select-wrapper">
+                            <select id="gov-select" aria-label="Select Governorate">
+                                <option value="">كل المحافظات</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <!-- City Select -->
+                    <div class="filter-group">
+                        <label for="city-select"><i class="fa-solid fa-tree-city"></i> المدينة / الحي</label>
+                        <div class="select-wrapper">
+                            <select id="city-select" disabled aria-label="Select City/District">
+                                <option value="">كل المدن</option>
+                            </select>
+                        </div>
+                    </div>
+ 
+                    <!-- Network Classification Filter -->
+                    <div class="filter-group">
+                        <label><i class="fa-solid fa-shield-halved"></i> تصنيف الشبكة</label>
+                        <div class="chips-group">
+                            <button class="chip active" data-class="all" id="chip-class-all">الكل</button>
+                            <button class="chip" data-class="A+" id="chip-class-aplus">شبكة A+</button>
+                            <button class="chip" data-class="A" id="chip-class-a">شبكة A</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- List Results Count -->
+            <div class="results-meta">
+                <span class="count-text">مقدمي الخدمة المتاحين: <strong id="filtered-count">0</strong> من أصل <strong id="total-count">0</strong></span>
+            </div>
+            
+            <!-- Providers List View -->
+            <div class="results-list-container">
+                <div class="list-shimmer" id="list-shimmer-id">
+                    <div class="shimmer-card"></div>
+                    <div class="shimmer-card"></div>
+                    <div class="shimmer-card"></div>
+                </div>
+                <div class="results-list" id="providers-list-id"></div>
+            </div>
+        </aside>
+        
+        <!-- Premium Detail Sheet (Glassmorphic Slide-Out Panel on bottom/side) -->
+        <div class="detail-sheet" id="detail-sheet-id">
+            <button class="close-sheet-btn" id="close-sheet-btn-id" title="إغلاق التفاصيل" aria-label="Close details">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="detail-sheet-content" id="detail-sheet-content-id">
+                <!-- Dynamically populated detail template -->
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Custom App Logic -->
+    <script src="app.js"></script>
+</body>
+</html>
