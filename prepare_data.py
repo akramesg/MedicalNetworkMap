@@ -162,6 +162,28 @@ def extract_coords(url):
             
     return None
 
+def extract_coords_from_address(addr):
+    if not addr:
+        return None
+    # 1. Search for any Google Maps URL in the address
+    urls = re.findall(r'(https?://[^\s]+)', addr)
+    for u in urls:
+        res = extract_coords(u)
+        if res:
+            return res[0], res[1], "addr_url_" + res[2]
+            
+    # 2. Search for explicit decimal coordinate pairs in address, e.g. 30.012345, 31.123456
+    coords_match = re.search(r'([23]\d\.\d{4,8})\s*,\s*([23]\d\.\d{4,8})', addr)
+    if coords_match:
+        try:
+            lat, lng = float(coords_match.group(1)), float(coords_match.group(2))
+            if 20 <= lat <= 33 and 23 <= lng <= 38:
+                return lat, lng, "addr_explicit_coords"
+        except ValueError:
+            pass
+            
+    return None
+
 def clean_str(val):
     if val is None:
         return ""
@@ -209,6 +231,14 @@ def main():
         "dir_dest_single": 0,
         "query_coord": 0,
         "viewport_fallback_at": 0,
+        "addr_url_exact_place_3d": 0,
+        "addr_url_dir_dest_1d2d": 0,
+        "addr_url_dir_dest_double": 0,
+        "addr_url_dir_dest_single": 0,
+        "addr_url_query_coord": 0,
+        "addr_url_viewport_fallback_at": 0,
+        "addr_explicit_coords": 0,
+        "fallback_addr_neighborhood": 0,
         "fallback_city": 0,
         "fallback_gov": 0,
         "fallback_egypt": 0
@@ -237,43 +267,69 @@ def main():
             
         coords_res = extract_coords(url)
         lat, lng = None, None
+        method = ""
         
         if coords_res:
             lat, lng, method = coords_res
             coord_stats[method] += 1
         else:
-            # Geocoding fallbacks
-            city_normalized = city.replace("أ", "ا").replace("إ", "ا").replace("ة", "ه").strip()
-            found = False
-            
-            # Match specific city
-            for k, (clat, clng) in FALLBACK_COORDS.items():
-                k_normalized = k.replace("أ", "ا").replace("إ", "ا").replace("ة", "ه").strip()
-                if city_normalized and (city_normalized in k_normalized or k_normalized in city_normalized):
-                    lat, lng = clat, clng
-                    coord_stats["fallback_city"] += 1
-                    found = True
-                    break
-            
-            # Match Governorate
-            if not found:
-                gov_normalized = gov.replace("أ", "ا").replace("إ", "ا").replace("ة", "ه").strip()
-                for k, (glat, glng) in FALLBACK_COORDS.items():
+            # 1. Try to extract exact coordinates from the Address field!
+            addr_coords = extract_coords_from_address(addr)
+            if addr_coords:
+                lat, lng, method = addr_coords
+                if method not in coord_stats:
+                    coord_stats[method] = 0
+                coord_stats[method] += 1
+            else:
+                # Geocoding fallbacks using neighborhoods, city or governorates
+                addr_normalized = addr.replace("أ", "ا").replace("إ", "ا").replace("ة", "ه").strip()
+                found = False
+                
+                # A. Try to match specific neighborhoods or major cities in the Address field first!
+                specific_neighborhoods = [
+                    "مصر الجديدة", "مدينة نصر", "التجمع الخامس", "التجمع", "المعادى", "المهندسين", 
+                    "الدقى", "الدقي", "وسط البلد", "حلوان", "شبرا", "حدائق القبة", "الهرم", "فيصل", 
+                    "العبور", "الشروق", "الشيخ زايد", "6 اكتوبر", "6 أكتوبر", "المقطم", "العباسية", 
+                    "سيدي بشر", "ميامي", "لوران", "زيزينيا", "سموحة", "الغردقة", "الجونة", "شرم الشيخ", "العلمين"
+                ]
+                for k in sorted(FALLBACK_COORDS.keys(), key=len, reverse=True):
                     k_normalized = k.replace("أ", "ا").replace("إ", "ا").replace("ة", "ه").strip()
-                    if gov_normalized and (gov_normalized in k_normalized or k_normalized in gov_normalized):
-                        lat, lng = glat, glng
-                        coord_stats["fallback_gov"] += 1
+                    if k in specific_neighborhoods and k_normalized in addr_normalized:
+                        lat, lng = FALLBACK_COORDS[k]
+                        coord_stats["fallback_addr_neighborhood"] += 1
                         found = True
                         break
-            
-            # Fallback to Cairo
-            if not found:
-                lat, lng = FALLBACK_COORDS["القاهرة"]
-                coord_stats["fallback_egypt"] += 1
-            
-            # Jitter slightly for visual scatter
-            lat += random.uniform(-0.008, 0.008)
-            lng += random.uniform(-0.008, 0.008)
+                
+                # B. Match specific city
+                if not found:
+                    city_normalized = city.replace("أ", "ا").replace("إ", "ا").replace("ة", "ه").strip()
+                    for k, (clat, clng) in FALLBACK_COORDS.items():
+                        k_normalized = k.replace("أ", "ا").replace("إ", "ا").replace("ة", "ه").strip()
+                        if city_normalized and (city_normalized in k_normalized or k_normalized in city_normalized):
+                            lat, lng = clat, clng
+                            coord_stats["fallback_city"] += 1
+                            found = True
+                            break
+                
+                # C. Match Governorate
+                if not found:
+                    gov_normalized = gov.replace("أ", "ا").replace("إ", "ا").replace("ة", "ه").strip()
+                    for k, (glat, glng) in FALLBACK_COORDS.items():
+                        k_normalized = k.replace("أ", "ا").replace("إ", "ا").replace("ة", "ه").strip()
+                        if gov_normalized and (gov_normalized in k_normalized or k_normalized in gov_normalized):
+                            lat, lng = glat, glng
+                            coord_stats["fallback_gov"] += 1
+                            found = True
+                            break
+                
+                # D. Fallback to Cairo
+                if not found:
+                    lat, lng = FALLBACK_COORDS["القاهرة"]
+                    coord_stats["fallback_egypt"] += 1
+                
+                # Jitter slightly for visual scatter
+                lat += random.uniform(-0.008, 0.008)
+                lng += random.uniform(-0.008, 0.008)
 
         if not pclass:
             pclass = "A"

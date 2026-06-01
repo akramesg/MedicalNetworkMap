@@ -46,6 +46,9 @@ const countLabs = document.getElementById("count-labs");
 const countPharmacies = document.getElementById("count-pharmacies");
 const countClinics = document.getElementById("count-clinics");
 const countRadiology = document.getElementById("count-radiology");
+const countDental = document.getElementById("count-dental");
+const countPhysio = document.getElementById("count-physio");
+const countOther = document.getElementById("count-other");
 
 // Category Helpers
 const CATEGORY_MAPPINGS = {
@@ -55,8 +58,8 @@ const CATEGORY_MAPPINGS = {
     "عيادة": { class: "clinic", icon: "fa-user-doctor" },
     "مجمع عيادات": { class: "clinic", icon: "fa-user-doctor" },
     "مركز طبي متخصص": { class: "clinic", icon: "fa-user-doctor" },
-    "مركز علاج طبيعي": { class: "clinic", icon: "fa-user-doctor" },
-    "أسنان": { class: "clinic", icon: "fa-tooth" },
+    "مركز علاج طبيعي": { class: "physio", icon: "fa-hand-holding-medical" },
+    "أسنان": { class: "dental", icon: "fa-tooth" },
     "مركز أشعة": { class: "radiology", icon: "fa-x-ray" },
     "أشعة/تحاليل": { class: "radiology", icon: "fa-x-ray" },
     "مركز بصريات": { class: "other", icon: "fa-glasses" }
@@ -72,7 +75,9 @@ function getTypeGroup(type) {
     if (type === "معمل تحاليل" || type === "أشعة/تحاليل") return "معمل تحاليل";
     if (type === "صيدلية") return "صيدلية";
     if (type === "مركز أشعة") return "مركز أشعة";
-    if (["عيادة", "مجمع عيادات", "مركز طبي متخصص", "مركز علاج طبيعي", "أسنان"].includes(type)) return "عيادة";
+    if (type === "مركز علاج طبيعي") return "مركز علاج طبيعي";
+    if (type === "أسنان") return "أسنان";
+    if (["عيادة", "مجمع عيادات", "مركز طبي متخصص"].includes(type)) return "عيادة";
     return "other";
 }
 
@@ -294,7 +299,10 @@ function updateStats() {
         lab: 0,
         pharmacy: 0,
         clinic: 0,
-        radiology: 0
+        dental: 0,
+        physio: 0,
+        radiology: 0,
+        other: 0
     };
 
     filteredProviders.forEach(p => {
@@ -303,7 +311,10 @@ function updateStats() {
         else if (grp === "معمل تحاليل") counts.lab++;
         else if (grp === "صيدلية") counts.pharmacy++;
         else if (grp === "عيادة") counts.clinic++;
+        else if (grp === "أسنان") counts.dental++;
+        else if (grp === "مركز علاج طبيعي") counts.physio++;
         else if (grp === "مركز أشعة") counts.radiology++;
+        else if (grp === "other") counts.other++;
     });
 
     // Update UI Tickers
@@ -312,7 +323,10 @@ function updateStats() {
     countLabs.textContent = counts.lab;
     countPharmacies.textContent = counts.pharmacy;
     countClinics.textContent = counts.clinic;
+    countDental.textContent = counts.dental;
+    countPhysio.textContent = counts.physio;
     countRadiology.textContent = counts.radiology;
+    countOther.textContent = counts.other;
 }
 
 // ==========================================
@@ -512,6 +526,17 @@ function setupEventListeners() {
     // Theme toggle click
     if (themeToggleBtn) {
         themeToggleBtn.addEventListener("click", toggleTheme);
+    }
+
+    // Horizontal mouse wheel scroll for category legend overlay
+    const legendScrollContainer = document.querySelector(".legend-scroll-container");
+    if (legendScrollContainer) {
+        legendScrollContainer.addEventListener("wheel", (e) => {
+            if (e.deltaY !== 0) {
+                e.preventDefault();
+                legendScrollContainer.scrollLeft += e.deltaY;
+            }
+        });
     }
 
     // Reset View Map click

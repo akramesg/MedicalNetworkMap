@@ -14,6 +14,8 @@
     --col-pharmacy: hsl(142, 71%, 45%);   /* Emerald Green */
     --col-clinic: hsl(217, 91%, 60%);     /* Deep Indigo Blue */
     --col-radiology: hsl(38, 92%, 50%);    /* Warm Amber Orange */
+    --col-physio: hsl(316, 75%, 50%);     /* Beautiful Magenta/Rose Pink */
+    --col-dental: hsl(197, 85%, 45%);     /* Premium Tealish Cyan Blue */
     --col-other: hsl(271, 76%, 53%);      /* Royal Purple */
 
     /* Typography */
@@ -221,12 +223,23 @@ body {
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-premium);
     overflow-x: auto;
-    max-width: 100%;
-    scrollbar-width: none; /* Hide scrollbar Firefox */
+    scrollbar-width: thin;
+    scrollbar-color: var(--scrollbar-thumb) transparent;
 }
 
 .legend-scroll-container::-webkit-scrollbar {
-    display: none; /* Hide scrollbar Webkit */
+    display: block;
+    height: 5px;
+}
+.legend-scroll-container::-webkit-scrollbar-track {
+    background: transparent;
+}
+.legend-scroll-container::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb);
+    border-radius: 4px;
+}
+.legend-scroll-container::-webkit-scrollbar-thumb:hover {
+    background: var(--primary);
 }
 
 .legend-pill {
@@ -269,6 +282,9 @@ body {
 .pill-dot.pharmacy { background-color: var(--col-pharmacy); }
 .pill-dot.clinic { background-color: var(--col-clinic); }
 .pill-dot.radiology { background-color: var(--col-radiology); }
+.pill-dot.physio { background-color: var(--col-physio); }
+.pill-dot.dental { background-color: var(--col-dental); }
+.pill-dot.other { background-color: var(--col-other); }
 
 .pill-count {
     font-family: var(--font-en);
@@ -743,7 +759,10 @@ select:disabled {
 .provider-card[data-type-group="معمل تحاليل"]::before { background-color: var(--col-lab); }
 .provider-card[data-type-group="صيدلية"]::before { background-color: var(--col-pharmacy); }
 .provider-card[data-type-group="عيادة"]::before { background-color: var(--col-clinic); }
+.provider-card[data-type-group="مركز علاج طبيعي"]::before { background-color: var(--col-physio); }
+.provider-card[data-type-group="أسنان"]::before { background-color: var(--col-dental); }
 .provider-card[data-type-group="مركز أشعة"]::before { background-color: var(--col-radiology); }
+.provider-card[data-type-group="other"]::before { background-color: var(--col-other); }
 
 .card-top {
     display: flex;
@@ -765,6 +784,8 @@ select:disabled {
 .card-type.pharmacy { background-color: var(--col-pharmacy); }
 .card-type.clinic { background-color: var(--col-clinic); }
 .card-type.radiology { background-color: var(--col-radiology); }
+.card-type.physio { background-color: var(--col-physio); }
+.card-type.dental { background-color: var(--col-dental); }
 .card-type.other { background-color: var(--col-other); }
 
 .card-meta-badges {
@@ -927,6 +948,8 @@ select:disabled {
 .custom-leaflet-marker.pharmacy .marker-pin-wrapper { background: var(--col-pharmacy); }
 .custom-leaflet-marker.clinic .marker-pin-wrapper { background: var(--col-clinic); }
 .custom-leaflet-marker.radiology .marker-pin-wrapper { background: var(--col-radiology); }
+.custom-leaflet-marker.physio .marker-pin-wrapper { background: var(--col-physio); }
+.custom-leaflet-marker.dental .marker-pin-wrapper { background: var(--col-dental); }
 .custom-leaflet-marker.other .marker-pin-wrapper { background: var(--col-other); }
 
 /* Marker Hover Scales */
